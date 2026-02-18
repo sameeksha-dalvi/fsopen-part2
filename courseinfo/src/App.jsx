@@ -42,11 +42,12 @@ const Content = ({ parts }) => {
 
 const Total = ({ parts }) => {
   console.log("Total : ", parts);
+
+  const total = parts.reduce((s, p) => s + p.exercises,0);
+  console.log("totaltotal"+total);
   return (
     <>
-      <p>Number of exercises {
-      parts.map(part => part.exercises).reduce((sum , n) => sum + n)
-      }
+      <p>Number of exercises {total}
       </p>
     </>
   )
