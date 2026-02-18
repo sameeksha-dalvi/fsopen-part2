@@ -1,17 +1,18 @@
 const Course = (props) => {
   console.log("Course :", props.course.parts)
 
-  return(
+  return (
     <>
-    <Header name={props.course.name} />
-    <Content parts={props.course.parts}/>
+      <Header name={props.course.name} />
+      <Content parts={props.course.parts} />
+      <Total parts={props.course.parts} />
     </>
   )
 }
 
 
 const Header = (props) => {
-  console.log("Header ",props)
+  console.log("Header ", props)
   return (
     <>
       <h1>{props.name}</h1>
@@ -19,7 +20,7 @@ const Header = (props) => {
   )
 }
 
-const Part = ({part}) => {
+const Part = ({ part }) => {
   return (
     <>
       <p>
@@ -29,21 +30,24 @@ const Part = ({part}) => {
   )
 }
 
-const Content = ({parts}) => {
+const Content = ({ parts }) => {
   return (
     <>
-    {parts.map(part => <Part key={part.id} part={part} />)}
+      {parts.map(part => <Part key={part.id} part={part} />)}
     </>
   )
 
 }
 
 
-const Total = (props) => {
-
+const Total = ({ parts }) => {
+  console.log("Total : ", parts);
   return (
     <>
-      <p>Number of exercises {props.course.parts[0].exercises + props.course.parts[1].exercises + props.course.parts[2].exercises}</p>
+      <p>Number of exercises {
+      parts.map(part => part.exercises).reduce((sum , n) => sum + n)
+      }
+      </p>
     </>
   )
 }
@@ -67,6 +71,11 @@ const App = () => {
         name: 'State of a component',
         exercises: 14,
         id: 3
+      },
+      {
+        name: 'Typescript',
+        exercises: 4,
+        id: 4
       }
     ]
   }
