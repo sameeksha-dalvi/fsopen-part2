@@ -19,22 +19,20 @@ const Header = (props) => {
   )
 }
 
-const Part = (props) => {
+const Part = ({part}) => {
   return (
     <>
       <p>
-        {props.part} {props.excercise}
+        {part.name} {part.exercises}
       </p>
     </>
   )
 }
 
-const Content = (props) => {
+const Content = ({parts}) => {
   return (
     <>
-      <Part part={props.parts[0].name} excercise={props.parts[0].exercises} />
-      <Part part={props.parts[1].name} excercise={props.parts[1].exercises} />
-      <Part part={props.parts[2].name} excercise={props.parts[2].exercises} />
+    {parts.map(part => <Part key={part.id} part={part} />)}
     </>
   )
 
