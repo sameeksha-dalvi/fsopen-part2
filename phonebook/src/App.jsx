@@ -2,9 +2,9 @@ import { useState } from 'react'
 
 const Person = (props) => {
   console.log("Person props", props);
-  return(
+  return (
     <>
-    <p>{props.name}</p>
+      <p>{props.name}</p>
     </>
   )
 }
@@ -17,9 +17,15 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault()
-    console.log('add btn clicked', event.target)
-    console.log('new name is :',newName)
-    setPersons(persons.concat({name: newName}))
+    console.log("persons array", persons);
+    const result = persons.filter((person) => person.name.toLowerCase() === newName.toLowerCase());
+    console.log("result :", result);
+
+    if (result.length > 0) {
+      alert(`${newName} is already added to phonebook`);
+      return;
+    }
+    setPersons(persons.concat({ name: newName }))
     setNewName('')
   }
 
@@ -42,9 +48,9 @@ const App = () => {
         </div>
       </form>
       <h2>Numbers</h2>
-        {persons.map(person =>
-          <Person key={person.name} name={person.name} />
-        )}
+      {persons.map(person =>
+        <Person key={person.name} name={person.name} />
+      )}
     </div>
   )
 }
