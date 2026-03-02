@@ -24,7 +24,7 @@ const Filter = (props) => {
   )
 }
 
-const Persons = ({ personsToShow, deleteContactOf}) => {
+const Persons = ({ personsToShow, deleteContactOf }) => {
 
   return (
     <>
@@ -83,19 +83,35 @@ const App = () => {
 
   const addName = (event) => {
     event.preventDefault()
-    console.log("persons array", persons);
+    //console.log("persons array", persons);
     const result = persons.filter((person) => person.name.toLowerCase() === newName.toLowerCase());
-    console.log("result :", result);
-
-    if (result.length > 0) {
-      alert(`${newName} is already added to phonebook`);
-      return;
-    }
+    //console.log("result :", result[0].id);
 
     const personObject = {
       name: newName,
       number: newNumber
     }
+    //console.log("personObject ",personObject)
+    if (result.length > 0) {
+      const id = result[0].id;
+      if (window.confirm(`${personObject.name} is already added to phonebook, replace the old number with a new one?`)) {
+        personService
+          .updateContact(id, personObject)
+          .then(returnedContact => {
+            setPersons(persons.map(person => person.id === id ? returnedContact : person))
+            setNewName('')
+            setNewNumber('')
+          })
+          .catch(error => {
+            alert(`${personObject.name} was already deleted from the server`);
+            setPersons(persons.filter(p => p.id !== id))
+          })
+      }
+
+      return;
+    }
+
+
 
     personService
       .createContact(personObject)
@@ -130,15 +146,16 @@ const App = () => {
 
   const deleteContactOf = (id) => {
     const person = persons.find(p => p.id === id)
-  if (window.confirm(`Delete ${person.name} ?`)) {
-    personService
-      .deleteContact(id)
-      .then(response => {
-        setPersons(persons.filter(p => p.id !== id))
-      })
+    if (window.confirm(`Delete ${person.name} ?`)) {
+      personService
+        .deleteContact(id)
+        .then(response => {
+          setPersons(persons.filter(p => p.id !== id))
+        })
+    }
+
   }
 
-}
 
   return (
     <div>
@@ -153,7 +170,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} deleteContactOf={deleteContactOf}/>
+      <Persons personsToShow={personsToShow} deleteContactOf={deleteContactOf} />
     </div>
   )
 }
