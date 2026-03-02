@@ -2,11 +2,12 @@ import { useState, useEffect } from 'react'
 import axios from 'axios'
 import personService from './services/persons'
 
-const Person = (props) => {
+const Person = ({ name, number, deleteContact }) => {
   //console.log("Person props", props);
   return (
     <>
-      <p>{props.name} {props.number}</p>
+      <p>{name} {number}</p>
+      <button onClick={deleteContact}>delete</button>
     </>
   )
 }
@@ -23,19 +24,24 @@ const Filter = (props) => {
   )
 }
 
-const Persons = ({ personsToShow }) => {
+const Persons = ({ personsToShow, deleteContactOf}) => {
 
   return (
     <>
       {personsToShow.map(person =>
-        <Person key={person.name} name={person.name} number={person.number} />
+        <Person
+          key={person.id}
+          name={person.name}
+          number={person.number}
+          deleteContact={() => deleteContactOf(person.id)}
+        />
       )}
     </>
   )
 }
 
 const PersonForm = (props) => {
-  console.log("PersonForm ", props)
+  //console.log("PersonForm ", props)
   return (<>
     <form onSubmit={props.addName}>
       <div>
@@ -55,6 +61,9 @@ const PersonForm = (props) => {
     </form>
   </>)
 }
+
+
+
 
 const App = () => {
   const [persons, setPersons] = useState([])
@@ -89,12 +98,12 @@ const App = () => {
     }
 
     personService
-    .create(personObject)
-    .then(returnContact => {
-       setPersons(persons.concat(returnContact))
+      .createContact(personObject)
+      .then(returnContact => {
+        setPersons(persons.concat(returnContact))
         setNewName('')
         setNewNumber('')
-    })
+      })
 
 
   }
@@ -119,6 +128,18 @@ const App = () => {
 
   //console.log("Filtered persons:", personsToShow);
 
+  const deleteContactOf = (id) => {
+    const person = persons.find(p => p.id === id)
+  if (window.confirm(`Delete ${person.name} ?`)) {
+    personService
+      .deleteContact(id)
+      .then(response => {
+        setPersons(persons.filter(p => p.id !== id))
+      })
+  }
+
+}
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -132,7 +153,7 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      <Persons personsToShow={personsToShow} />
+      <Persons personsToShow={personsToShow} deleteContactOf={deleteContactOf}/>
     </div>
   )
 }
