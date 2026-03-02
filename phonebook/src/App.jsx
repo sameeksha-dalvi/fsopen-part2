@@ -34,24 +34,24 @@ const Persons = ({ personsToShow }) => {
 }
 
 const PersonForm = (props) => {
-console.log("PersonForm ",props)
-  return(<>
-  <form onSubmit={props.addName}>
-        <div>
-          name:
-          <input value={props.newName}
-            onChange={props.handleNameChange}
-          />
-        </div>
-        <div>number:
-          <input value={props.newNumber}
-            onChange={props.handleNumberChange}
-          />
-        </div>
-        <div>
-          <button type="submit">add</button>
-        </div>
-      </form>
+  console.log("PersonForm ", props)
+  return (<>
+    <form onSubmit={props.addName}>
+      <div>
+        name:
+        <input value={props.newName}
+          onChange={props.handleNameChange}
+        />
+      </div>
+      <div>number:
+        <input value={props.newNumber}
+          onChange={props.handleNumberChange}
+        />
+      </div>
+      <div>
+        <button type="submit">add</button>
+      </div>
+    </form>
   </>)
 }
 
@@ -61,18 +61,17 @@ const App = () => {
   const [newNumber, setNewNumber] = useState('');
   const [newFilter, setNewFilter] = useState('');
 
-
   const hook = () => {
-  console.log('effect')
-  axios
-    .get('http://localhost:3001/persons')
-    .then(response => {
-      console.log('promise fulfilled')
-      setPersons(response.data)
-    })
-}
+    console.log('effect')
+    axios
+      .get('http://localhost:3001/persons')
+      .then(response => {
+        console.log('promise fulfilled')
+        setPersons(response.data)
+      })
+  }
 
-useEffect(hook, [])
+  useEffect(hook, [])
 
   const addName = (event) => {
     event.preventDefault()
@@ -84,9 +83,21 @@ useEffect(hook, [])
       alert(`${newName} is already added to phonebook`);
       return;
     }
-    setPersons(persons.concat({ name: newName, number: newNumber }))
-    setNewName('')
-    setNewNumber('')
+
+    const personObject = {
+      name: newName,
+      number: newNumber
+    }
+
+    axios
+      .post('http://localhost:3001/persons', personObject)
+      .then(response => {
+        setPersons(persons.concat(response.data))
+        setNewName('')
+        setNewNumber('')
+      })
+
+
   }
 
   const handleNameChange = (event) => {
@@ -114,12 +125,12 @@ useEffect(hook, [])
       <h2>Phonebook</h2>
       <Filter newFilter={newFilter} onChange={handleFilterChange} />
       <h2>add a new</h2>
-      <PersonForm 
-      addName={addName}
-      newName={newName}
-      handleNameChange={handleNameChange}
-      newNumber={newNumber}
-      handleNumberChange={handleNumberChange}
+      <PersonForm
+        addName={addName}
+        newName={newName}
+        handleNameChange={handleNameChange}
+        newNumber={newNumber}
+        handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
       <Persons personsToShow={personsToShow} />
