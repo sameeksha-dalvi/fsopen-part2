@@ -5,7 +5,9 @@ function App() {
   const [allCountires, setAllCountries] = useState([]);
   const [newCountry, setNewCountry] = useState('');
   const [selectedCountry, setSelectedCountry] = useState(null);
+  const [weather, setWeather] = useState(null);
 
+  const apiKey = import.meta.env.VITE_WEATHER_KEY;
 
   useEffect(() => {
     axios('https://studies.cs.helsinki.fi/restcountries/api/all')
@@ -24,10 +26,24 @@ function App() {
     country.name.common.toLowerCase().includes(newCountry.toLowerCase())
   )
 
-   const countriesToDisplay = selectedCountry 
-    ? [selectedCountry] 
+  const countriesToDisplay = selectedCountry
+    ? [selectedCountry]
     : filterCountry;
-  
+
+useEffect(() => {
+    if (countriesToDisplay.length === 1) {
+      const c = countriesToDisplay[0];
+      const capital = c.capital?.[0];
+
+      if (!capital) return;
+
+      axios.get(
+        `https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/${capital}?unitGroup=metric&key=${apiKey}&contentType=json`
+      )
+      .then(res => setWeather(res.data))
+      .catch(err => console.log("Weather error:", err));
+    }
+  }, [countriesToDisplay, apiKey]);
 
   return (
     <>
@@ -38,37 +54,44 @@ function App() {
         />
         {(() => {
           if (countriesToDisplay.length > 10) {
-          return <p>Too many matches, specify another filter</p>;
-        }
+            return <p>Too many matches, specify another filter</p>;
+          }
 
-        if (countriesToDisplay.length > 1) {
-          return (
-            <ul>
-              {countriesToDisplay.map(c => (
-                <li key={c.name.common}>
-                  {c.name.common} 
-                  <button onClick={() => setSelectedCountry(c)}>
-                    show
-                  </button>
-                </li>
-              ))}
-            </ul>
-          );
-        }
+          if (countriesToDisplay.length > 1) {
+            return (
+              <ul>
+                {countriesToDisplay.map(c => (
+                  <li key={c.name.common}>
+                    {c.name.common}
+                    <button onClick={() => setSelectedCountry(c)}>
+                      show
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            );
+          }
 
-        if (countriesToDisplay.length === 1) {
-          const c = countriesToDisplay[0];
-          return (
-            <div>
-              <h2>{c.name.common}</h2>
-              <p>capital: {c.capital}</p>
-              <p>area: {c.area}</p>
-              <img src={c.flags.png} width="150" />
-            </div>
-          );
-        }
+          if (countriesToDisplay.length === 1) {
+            const c = countriesToDisplay[0];
+            return (
+              <div>
+                <h2>{c.name.common}</h2>
+                <p>capital: {c.capital}</p>
+                <p>area: {c.area}</p>
+                <img src={c.flags.png} width="150" />
+                {weather && (
+                  <div>
+                    <h3>Weather in {c.capital}</h3>
+                    <p>Temperature: {weather.currentConditions.temp} °C</p>
+                    <p>Wind: {weather.currentConditions.windspeed} m/s</p>
+                  </div>
+                )}
+              </div>
+            );
+          }
 
-        return null;
+          return null;
 
         })()}
       </div>
