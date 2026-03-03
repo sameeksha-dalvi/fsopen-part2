@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import axios from 'axios'
 import personService from './services/persons'
+import Notification from './components/Notification'
 
 const Person = ({ name, number, deleteContact }) => {
   //console.log("Person props", props);
@@ -70,6 +70,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('');
   const [newFilter, setNewFilter] = useState('');
+  const [errorMessage, setErrorMessage] = useState('some error happened...')
+  const [notificationType, setNotificationType] = useState(null)
 
   useEffect(() => {
 
@@ -103,7 +105,14 @@ const App = () => {
             setNewNumber('')
           })
           .catch(error => {
-            alert(`${personObject.name} was already deleted from the server`);
+            setErrorMessage(
+              `Information of ${personObject.name} has already been removed from the server`
+            )
+            setNotificationType('error')
+            setTimeout(() => {
+              setErrorMessage(null)
+              setNotificationType(null)
+            }, 5000)
             setPersons(persons.filter(p => p.id !== id))
           })
       }
@@ -116,6 +125,16 @@ const App = () => {
     personService
       .createContact(personObject)
       .then(returnContact => {
+
+        setErrorMessage(
+              `Added ${returnContact.name}`
+            )
+            setNotificationType('success')
+            setTimeout(() => {
+              setErrorMessage(null)
+              setNotificationType(null)
+            }, 5000)
+
         setPersons(persons.concat(returnContact))
         setNewName('')
         setNewNumber('')
@@ -160,6 +179,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={errorMessage} type={notificationType}/>
       <Filter newFilter={newFilter} onChange={handleFilterChange} />
       <h2>add a new</h2>
       <PersonForm
