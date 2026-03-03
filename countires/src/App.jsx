@@ -4,6 +4,8 @@ import axios from "axios";
 function App() {
   const [allCountires, setAllCountries] = useState([]);
   const [newCountry, setNewCountry] = useState('');
+  const [selectedCountry, setSelectedCountry] = useState(null);
+
 
   useEffect(() => {
     axios('https://studies.cs.helsinki.fi/restcountries/api/all')
@@ -19,8 +21,13 @@ function App() {
   }
 
   const filterCountry = allCountires.filter(country =>
-      country.name.common.toLowerCase().includes(newCountry.toLowerCase())
+    country.name.common.toLowerCase().includes(newCountry.toLowerCase())
   )
+
+   const countriesToDisplay = selectedCountry 
+    ? [selectedCountry] 
+    : filterCountry;
+  
 
   return (
     <>
@@ -30,21 +37,27 @@ function App() {
           onChange={handleCountryChnage}
         />
         {(() => {
-          if (filterCountry.length > 10) {
+          if (countriesToDisplay.length > 10) {
           return <p>Too many matches, specify another filter</p>;
         }
-        if (filterCountry.length > 1) {
+
+        if (countriesToDisplay.length > 1) {
           return (
             <ul>
-              {filterCountry.map(c => (
-                <li key={c.name.common}>{c.name.common}</li>
+              {countriesToDisplay.map(c => (
+                <li key={c.name.common}>
+                  {c.name.common} 
+                  <button onClick={() => setSelectedCountry(c)}>
+                    show
+                  </button>
+                </li>
               ))}
             </ul>
           );
         }
 
-        if (filterCountry.length === 1) {
-          const c = filterCountry[0];
+        if (countriesToDisplay.length === 1) {
+          const c = countriesToDisplay[0];
           return (
             <div>
               <h2>{c.name.common}</h2>
@@ -56,6 +69,7 @@ function App() {
         }
 
         return null;
+
         })()}
       </div>
     </>
