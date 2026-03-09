@@ -3,7 +3,7 @@ const Notification = ({ message,type }) => {
     return null
   }
 
-  const className = type ? type : ''
+  const classType = type ? type : ''
   //console.log("Notification component: ",type)
   return (
     <div className={classType}>
