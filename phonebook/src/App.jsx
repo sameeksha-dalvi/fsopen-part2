@@ -127,17 +127,26 @@ const App = () => {
       .then(returnContact => {
 
         setErrorMessage(
-              `Added ${returnContact.name}`
-            )
-            setNotificationType('success')
-            setTimeout(() => {
-              setErrorMessage(null)
-              setNotificationType(null)
-            }, 5000)
+          `Added ${returnContact.name}`
+        )
+        setNotificationType('success')
+        setTimeout(() => {
+          setErrorMessage(null)
+          setNotificationType(null)
+        }, 5000)
 
         setPersons(persons.concat(returnContact))
         setNewName('')
         setNewNumber('')
+      }).catch(error => {
+
+        setErrorMessage(error.response.data.error)
+        setNotificationType('error')
+        setTimeout(() => {
+          setErrorMessage(null)
+          setNotificationType(null)
+        }, 5000)
+        console.log(error.response.data.error)
       })
 
 
@@ -179,7 +188,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Notification message={errorMessage} type={notificationType}/>
+      <Notification message={errorMessage} type={notificationType} />
       <Filter newFilter={newFilter} onChange={handleFilterChange} />
       <h2>add a new</h2>
       <PersonForm
